@@ -7,7 +7,9 @@ import (
 )
 
 func main() {
-	password := "examplepassword123"
+	fmt.Println("Enter your password:")
+	var password string
+	fmt.Scanln(&password)
 
 	// Check password length
 	if len(password) < 8 {
