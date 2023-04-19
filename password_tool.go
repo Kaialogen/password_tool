@@ -1,12 +1,10 @@
 package main
 
 import (
-	"bufio"
 	"fmt"
-	"log"
-	"os"
 	"strings"
 	"unicode"
+	"os"
 )
 
 func main() {
@@ -40,30 +38,30 @@ func main() {
 		fmt.Println("Password does not contain any special characters")
 	}
 
-	// Open the rockyou.txt file
-	file, err := os.Open("wordlists/rockyou.txt")
-	if err != nil {
-		log.Fatal(err)
-	}
-	defer file.Close()
+// Open the rockyou.txt file
+file, err := os.Open("wordlists/rockyou.txt")
+if err != nil {
+    log.Fatal(err)
+}
+defer file.Close()
 
-	// Read the file and split it into lines
-	scanner := bufio.NewScanner(file)
-	scanner.Split(bufio.ScanLines)
+// Read the file and split it into lines
+scanner := bufio.NewScanner(file)
+scanner.Split(bufio.ScanLines)
 
-	// Store each line/word from the file into a slice of strings
-	var dictionary []string
-	for scanner.Scan() {
-		dictionary = append(dictionary, scanner.Text())
-	}
+// Store each line/word from the file into a slice of strings
+var dictionary []string
+for scanner.Scan() {
+    dictionary = append(dictionary, scanner.Text())
+}
 
-	// Check if the password contains a dictionary word
-	for _, word := range dictionary {
-		if strings.Contains(strings.ToLower(password), word) {
-			fmt.Println("Password contains a dictionary word")
-			break
-		}
-	}
+// Check if the password contains a dictionary word
+for _, word := range dictionary {
+    if strings.Contains(strings.ToLower(password), word) {
+        fmt.Println("Password contains a dictionary word")
+        break
+    }
+}
 
 	// Check for repeating characters
 	for i := 0; i < len(password)-2; i++ {
