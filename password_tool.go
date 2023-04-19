@@ -130,7 +130,7 @@ func checkRepeatingChars(password string) int {
 
 func checkSequentialChars(password string) int {
 	for i := 0; i < len(password)-2; i++ {
-		if unicode.IsLetter(rune(password[i])) & unicode.IsLetter(rune(password[i+1])) && unicode.IsLetter(rune(password[i+2])) {
+		if unicode.IsLetter(rune(password[i])) && unicode.IsLetter(rune(password[i+1])) && unicode.IsLetter(rune(password[i+2])) {
 			if password[i]+1 == password[i+1] && password[i+1]+1 == password[i+2] {
 				fmt.Println("Password contains sequential characters")
 				return 0
@@ -148,4 +148,4 @@ func generatePassword(length int) string {
 		password.WriteByte(char)
 	}
 	return password.String()
-	}
+}
