@@ -4,32 +4,52 @@ import (
 	"bufio"
 	"fmt"
 	"log"
+	"math/rand"
 	"os"
 	"strings"
+	"time"
 	"unicode"
 )
 
 func main() {
-	fmt.Println("Enter your password:")
-	var password string
-	fmt.Scanln(&password)
+	fmt.Println("Select an option:")
+	fmt.Println("1. Check password strength")
+	fmt.Println("2. Generate a password")
 
-	score := 0
-	score += checkPasswordLength(password)
-	score += checkLowerCase(password)
-	score += checkUpperCase(password)
-	score += checkNumeric(password)
-	score += checkSpecialChars(password)
-	score += checkDictionaryWords(password)
-	score += checkRepeatingChars(password)
-	score += checkSequentialChars(password)
+	var choice int
+	fmt.Scanln(&choice)
 
-	if score >= 6 {
-		fmt.Println("Password is strong")
-	} else if score >= 4 {
-		fmt.Println("Password is medium")
+	if choice == 1 {
+		fmt.Println("Enter your password:")
+		var password string
+		fmt.Scanln(&password)
+
+		score := 0
+		score += checkPasswordLength(password)
+		score += checkLowerCase(password)
+		score += checkUpperCase(password)
+		score += checkNumeric(password)
+		score += checkSpecialChars(password)
+		score += checkDictionaryWords(password)
+		score += checkRepeatingChars(password)
+		score += checkSequentialChars(password)
+
+		if score >= 6 {
+			fmt.Println("Password is strong")
+		} else if score >= 4 {
+			fmt.Println("Password is medium")
+		} else {
+			fmt.Println("Password is weak")
+		}
+	} else if choice == 2 {
+		fmt.Println("Enter password length:")
+		var length int
+		fmt.Scanln(&length)
+
+		password := generatePassword(length)
+		fmt.Println("Generated password:", password)
 	} else {
-		fmt.Println("Password is weak")
+		fmt.Println("Invalid choice")
 	}
 }
 
@@ -118,4 +138,14 @@ func checkSequentialChars(password string) int {
 		}
 	}
 	return 1
+}
+
+func generatePassword(length int) string {
+	rand.Seed(time.Now().UnixNano())
+	var password strings.Builder
+	for i := 0; i < length; i++ {
+		char := byte(rand.Intn(94) + 33)
+		password.WriteByte(char)
+	}
+	return password.String()
 }
