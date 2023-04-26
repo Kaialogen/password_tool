@@ -20,7 +20,7 @@ func main() {
 		log.Fatal("Unable to create window:", err)
 	}
 	win.SetTitle("Password Checker & Generator")
-	win.SetResizable(true) // Make the window resizable
+	win.SetResizable(true)
 	win.Connect("destroy", func() {
 		gtk.MainQuit()
 	})
@@ -61,7 +61,7 @@ func main() {
 	}
 	grid.Attach(lengthLabel, 0, 2, 1, 1)
 
-	lengthAdjustment, err := gtk.AdjustmentNew(8, 1, 64, 1, 10, 0)
+	lengthAdjustment, err := gtk.AdjustmentNew(8, 1, 128, 1, 10, 0)
 	if err != nil {
 		log.Fatal("Unable to create adjustment:", err)
 	}
@@ -72,29 +72,77 @@ func main() {
 	}
 	grid.Attach(lengthSpinButton, 1, 2, 1, 1)
 
+	// Toggle switches for character types
+	lowercaseSwitch, err := gtk.SwitchNew()
+	if err != nil {
+		log.Fatal("Unable to create switch:", err)
+	}
+	grid.Attach(lowercaseSwitch, 1, 3, 1, 1)
+	lowercaseLabel, err := gtk.LabelNew("Include lowercase:")
+	if err != nil {
+		log.Fatal("Unable to create label:", err)
+	}
+	grid.Attach(lowercaseLabel, 0, 3, 1, 1)
+
+	uppercaseSwitch, err := gtk.SwitchNew()
+	if err != nil {
+		log.Fatal("Unable to create switch:", err)
+	}
+	grid.Attach(uppercaseSwitch, 1, 4, 1, 1)
+	uppercaseLabel, err := gtk.LabelNew("Include uppercase:")
+	if err != nil {
+		log.Fatal("Unable to create label:", err)
+	}
+	grid.Attach(uppercaseLabel, 0, 4, 1, 1)
+
+	numbersSwitch, err := gtk.SwitchNew()
+	if err != nil {
+		log.Fatal("Unable to create switch:", err)
+	}
+	grid.Attach(numbersSwitch, 1, 5, 1, 1)
+	numbersLabel, err := gtk.LabelNew("Include numbers:")
+	if err != nil {
+		log.Fatal("Unable to create label:", err)
+	}
+	grid.Attach(numbersLabel, 0, 5, 1, 1)
+
+	symbolsSwitch, err := gtk.SwitchNew()
+	if err != nil {
+		log.Fatal("Unable to create switch:", err)
+	}
+	grid.Attach(symbolsSwitch, 1, 6, 1, 1)
+	symbolsLabel, err := gtk.LabelNew("Include symbols:")
+	if err != nil {
+		log.Fatal("Unable to create label:", err)
+	}
+	grid.Attach(symbolsLabel, 0, 6, 1, 1)
+
 	genButton, err := gtk.ButtonNewWithLabel("Generate")
 	if err != nil {
 		log.Fatal("Unable to create button:", err)
 	}
-	grid.Attach(genButton, 0, 3, 1, 1)
+	grid.Attach(genButton, 0, 7, 1, 1)
 
 	genLabel, err := gtk.LabelNew("")
 	if err != nil {
 		log.Fatal("Unable to create label:", err)
 	}
-	grid.Attach(genLabel, 1, 3, 1, 1)
+	grid.Attach(genLabel, 1, 7, 1, 1)
 
 	genButton.Connect("clicked", func() {
 		length := int(lengthAdjustment.GetValue())
-		password := generatePassword(length)
+		includeLowercase := lowercaseSwitch.GetActive()
+		includeUppercase := uppercaseSwitch.GetActive()
+		includeNumbers := numbersSwitch.GetActive()
+		includeSymbols := symbolsSwitch.GetActive()
+
+		password := generatePassword(length, includeLowercase, includeUppercase, includeNumbers, includeSymbols)
 		genLabel.SetText(password)
 	})
 
 	win.ShowAll()
 	gtk.Main()
 }
-
-// ... rest of the code ...
 
 func checkPasswordStrength(password string) {
 	score := 0
@@ -224,11 +272,37 @@ func checkSequentialChars(password string) int {
 	return 1
 }
 
-func generatePassword(length int) string {
+func generatePassword(length int, includeLowercase, includeUppercase, includeNumbers, includeSymbols bool) string {
+	const (
+		lowercaseChars = "abcdefghijklmnopqrstuvwxyz"
+		uppercaseChars = "ABCDEFGHIJKLMNOPQRSTUVWXYZ"
+		numberChars    = "0123456789"
+		symbolChars    = "~`!@#$%^&*()-_=+[{]}\\|;:'\",<.>/?"
+	)
+
+	var allowedChars string
+
+	if includeLowercase {
+		allowedChars += lowercaseChars
+	}
+	if includeUppercase {
+		allowedChars += uppercaseChars
+	}
+	if includeNumbers {
+		allowedChars += numberChars
+	}
+	if includeSymbols {
+		allowedChars += symbolChars
+	}
+
+	if len(allowedChars) == 0 {
+		return ""
+	}
+
 	rand.Seed(time.Now().UnixNano())
 	var password strings.Builder
 	for i := 0; i < length; i++ {
-		char := byte(rand.Intn(94) + 33)
+		char := allowedChars[rand.Intn(len(allowedChars))]
 		password.WriteByte(char)
 	}
 	return password.String()
