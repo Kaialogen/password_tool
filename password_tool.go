@@ -20,6 +20,7 @@ func main() {
 		log.Fatal("Unable to create window:", err)
 	}
 	win.SetTitle("Password Checker & Generator")
+	win.SetResizable(true) // Make the window resizable
 	win.Connect("destroy", func() {
 		gtk.MainQuit()
 	})
