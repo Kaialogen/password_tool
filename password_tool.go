@@ -5,7 +5,6 @@ import (
 	"log"
 	"math/rand"
 	"os"
-	"strconv"
 	"strings"
 	"time"
 	"unicode"
@@ -14,10 +13,8 @@ import (
 )
 
 func main() {
-	// Initialize GTK3
 	gtk.Init(nil)
 
-	// Create a new window
 	win, err := gtk.WindowNew(gtk.WINDOW_TOPLEVEL)
 	if err != nil {
 		log.Fatal("Unable to create window:", err)
@@ -27,7 +24,6 @@ func main() {
 		gtk.MainQuit()
 	})
 
-	// Create a grid layout
 	grid, err := gtk.GridNew()
 	if err != nil {
 		log.Fatal("Unable to create grid:", err)
@@ -36,21 +32,18 @@ func main() {
 	grid.SetRowHomogeneous(true)
 	win.Add(grid)
 
-	// Add a label for the password field
 	passLabel, err := gtk.LabelNew("Enter password:")
 	if err != nil {
 		log.Fatal("Unable to create label:", err)
 	}
 	grid.Attach(passLabel, 0, 0, 1, 1)
 
-	// Add a text field for the password
 	passEntry, err := gtk.EntryNew()
 	if err != nil {
 		log.Fatal("Unable to create entry:", err)
 	}
 	grid.Attach(passEntry, 1, 0, 1, 1)
 
-	// Add a button to check password strength
 	checkButton, err := gtk.ButtonNewWithLabel("Check")
 	if err != nil {
 		log.Fatal("Unable to create button:", err)
@@ -61,46 +54,46 @@ func main() {
 		checkPasswordStrength(password)
 	})
 
-	// Add a label for the generated password
-	genLabel, err := gtk.LabelNew("")
+	lengthLabel, err := gtk.LabelNew("Password Length:")
 	if err != nil {
 		log.Fatal("Unable to create label:", err)
 	}
-	grid.Attach(genLabel, 0, 2, 2, 1)
+	grid.Attach(lengthLabel, 0, 2, 1, 1)
 
-	// Add a text field for the password length
-	genEntry, err := gtk.EntryNew()
+	lengthAdjustment, err := gtk.AdjustmentNew(8, 1, 128, 1, 10, 0)
 	if err != nil {
-		log.Fatal("Unable to create entry:", err)
+		log.Fatal("Unable to create adjustment:", err)
 	}
-	genEntry.SetText("8")
-	grid.Attach(genEntry, 1, 3, 1, 1)
 
-	// Add a button to generate password
+	lengthSpinButton, err := gtk.SpinButtonNew(lengthAdjustment, 1, 0)
+	if err != nil {
+		log.Fatal("Unable to create spin button:", err)
+	}
+	grid.Attach(lengthSpinButton, 1, 2, 1, 1)
+
 	genButton, err := gtk.ButtonNewWithLabel("Generate")
 	if err != nil {
 		log.Fatal("Unable to create button:", err)
 	}
-	grid.Attach(genButton, 1, 1, 1, 1)
+	grid.Attach(genButton, 0, 3, 1, 1)
+
+	genLabel, err := gtk.LabelNew("")
+	if err != nil {
+		log.Fatal("Unable to create label:", err)
+	}
+	grid.Attach(genLabel, 1, 3, 1, 1)
+
 	genButton.Connect("clicked", func() {
-		length, _ := genEntry.GetText()
+		length := int(lengthAdjustment.GetValue())
 		password := generatePassword(length)
 		genLabel.SetText(password)
 	})
 
-	// Add a label for the password length field
-	lenLabel, err := gtk.LabelNew("Length:")
-	if err != nil {
-		log.Fatal("Unable to create label:", err)
-	}
-	grid.Attach(lenLabel, 0, 3, 1, 1)
-
-	// Show the window
 	win.ShowAll()
-
-	// Start the GTK3 main loop
 	gtk.Main()
 }
+
+// ... rest of the code ...
 
 func checkPasswordStrength(password string) {
 	score := 0
@@ -122,7 +115,7 @@ func checkPasswordStrength(password string) {
 		strength = "weak"
 	}
 
-	dialog := gtk.MessageDialogNew(nil, gtk.DIALOG_MODAL, gtk.MESSAGE_INFO, gtk.BUTTONS_CLOSE, "Password strength: %s", strength)
+	dialog := gtk.MessageDialogNew(nil, gtk.DIALOG_MODAL, gtk.MESSAGE_INFO, gtk.BUTTONS_CLOSE, "Password strength %s", strength)
 	dialog.Run()
 	dialog.Destroy()
 }
@@ -184,6 +177,7 @@ func checkDictionaryWords(password string) int {
 		log.Fatal(err)
 	}
 	defer file.Close()
+
 	scanner := bufio.NewScanner(file)
 	scanner.Split(bufio.ScanLines)
 
@@ -201,7 +195,6 @@ func checkDictionaryWords(password string) int {
 		}
 	}
 	return 1
-
 }
 
 func checkRepeatingChars(password string) int {
@@ -230,16 +223,8 @@ func checkSequentialChars(password string) int {
 	return 1
 }
 
-func generatePassword(lengthStr string) string {
-	length, err := strconv.Atoi(lengthStr)
-	if err != nil || length < 8 {
-		dialog := gtk.MessageDialogNew(nil, gtk.DIALOG_MODAL, gtk.MESSAGE_WARNING, gtk.BUTTONS_CLOSE, "Invalid password length")
-		dialog.Run()
-		dialog.Destroy()
-		return ""
-	}
+func generatePassword(length int) string {
 	rand.Seed(time.Now().UnixNano())
-
 	var password strings.Builder
 	for i := 0; i < length; i++ {
 		char := byte(rand.Intn(94) + 33)
