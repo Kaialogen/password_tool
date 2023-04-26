@@ -1,5 +1,6 @@
 button {
-    color: #FF0000;
+    background-color: #FF0000;
+    font: 12px "Comic Sans";
 }
 window {
     background-color: #add8e6;
