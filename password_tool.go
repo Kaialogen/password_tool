@@ -9,11 +9,15 @@ import (
 	"time"
 	"unicode"
 
+	"github.com/gotk3/gotk3/gdk"
 	"github.com/gotk3/gotk3/gtk"
 )
 
 func main() {
+
 	gtk.Init(nil)
+
+	applyCustomCSS("styles.css")
 
 	win, err := gtk.WindowNew(gtk.WINDOW_TOPLEVEL)
 	if err != nil {
@@ -306,4 +310,23 @@ func generatePassword(length int, includeLowercase, includeUppercase, includeNum
 		password.WriteByte(char)
 	}
 	return password.String()
+}
+
+func applyCustomCSS(cssFile string) {
+	cssProvider, err := gtk.CssProviderNew()
+	if err != nil {
+		log.Fatal("Unable to create CSS provider:", err)
+	}
+
+	err = cssProvider.LoadFromPath(cssFile)
+	if err != nil {
+		log.Fatal("Unable to load CSS from file:", err)
+	}
+
+	screen, err := gdk.ScreenGetDefault()
+	if err != nil {
+		log.Fatal("Unable to get default screen:", err)
+	}
+
+	gtk.AddProviderForScreen(screen, cssProvider, gtk.STYLE_PROVIDER_PRIORITY_APPLICATION)
 }
