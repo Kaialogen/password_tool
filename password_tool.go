@@ -65,7 +65,7 @@ func main() {
 	}
 	grid.Attach(lengthLabel, 0, 2, 1, 1)
 
-	lengthAdjustment, err := gtk.AdjustmentNew(8, 1, 128, 1, 10, 0)
+	lengthAdjustment, err := gtk.AdjustmentNew(8, 1, 64, 1, 10, 0)
 	if err != nil {
 		log.Fatal("Unable to create adjustment:", err)
 	}
