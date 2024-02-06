@@ -1,8 +1,7 @@
 button {
     background-color: #ffffff;
-    font: 12px "Comic Sans";
+    font: 12px "Comic Sans", sans-serif;
 }
 window {
     background-color: #add8e6;
-    /* #add8e6 */ 
 }
